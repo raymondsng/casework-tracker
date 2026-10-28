@@ -1,31 +1,21 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/raymondsng/casework-tracker/internal/httpapi"
 )
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	response := map[string]string{
-		"status": "ok",
-	}
-
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		log.Printf("encoding health response: %v", err)
-	}
-}
-
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", healthHandler)
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: httpapi.NewRouter(),
+	}
 
 	log.Println("API listening on :8080")
 
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
